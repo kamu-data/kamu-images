@@ -1,0 +1,13 @@
+jupyter
+
+pandas
+
+bokeh
+pandas-bokeh
+folium
+
+mapboxgl
+shapely
+geojson
+
+sparkmagic3
