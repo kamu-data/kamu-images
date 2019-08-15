@@ -14,10 +14,19 @@ RUN cd /opt/spark/jars && \
 
 
 # Livy
+
+# TODO: Until Spark or Livy have a mechanism for auto-registering custom
+# UDTs and UDFs we are forced to fork Livy to register GeoSpark types.
+# RUN cd /opt && \
+#     wget http://apache.forsale.plus/incubator/livy/0.6.0-incubating/apache-livy-0.6.0-incubating-bin.zip && \
+#     unzip apache-livy*.zip && rm apache-livy*.zip && mv apache-livy* livy && \
+#     mkdir /opt/livy/logs
+
+ADD livy/apache-livy-0.7.0-kamu-bin.zip /opt
 RUN cd /opt && \
-    wget http://apache.forsale.plus/incubator/livy/0.6.0-incubating/apache-livy-0.6.0-incubating-bin.zip && \
     unzip apache-livy*.zip && rm apache-livy*.zip && mv apache-livy* livy && \
     mkdir /opt/livy/logs
+
 ADD livy/log4j.properties /opt/livy/conf/log4j.properties
 ADD livy/livy.conf /opt/livy/conf/livy.conf
 
