@@ -2,6 +2,12 @@ ARG SPARK_VERSION
 FROM kamudata/spark-py:$SPARK_VERSION
 
 
+# Tools
+RUN apk add jq
+RUN wget -O /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64" && \
+    chmod +x /usr/local/bin/yq
+
+
 # Logging
 ADD spark/log4j.properties /opt/spark/conf/log4j.properties
 
@@ -14,8 +20,8 @@ RUN cd /opt/spark/jars && \
 
 ADD spark/spark-defaults.conf /opt/spark/conf/spark-defaults.conf
 
-# Livy
 
+# Livy
 # TODO: Until Spark or Livy have a mechanism for auto-registering custom
 # UDTs and UDFs we are forced to fork Livy to register GeoSpark types.
 # RUN cd /opt && \
