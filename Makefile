@@ -1,4 +1,4 @@
-SPARK_VERSION = 2.4.0
+SPARK_VERSION = 3.0.1
 KAMU_VERSION = 0.0.1
 IMAGE_REPO = kamudata
 IMAGE_SPARK_UBER_TAG = $(SPARK_VERSION)_$(KAMU_VERSION)
@@ -7,11 +7,10 @@ IMAGE_JUPYTER_UBER_TAG = $(KAMU_VERSION)
 
 .PHONY: spark
 spark:
-	# NOTE: Spark's Dockerfile should be patched with
-	# https://github.com/apache/spark/pull/23898
 	cd $(SPARK_HOME) && ./bin/docker-image-tool.sh \
 		-r $(IMAGE_REPO) \
 		-t $(SPARK_VERSION) \
+		-p kubernetes/dockerfiles/spark/bindings/python/Dockerfile \
 		build
 
 

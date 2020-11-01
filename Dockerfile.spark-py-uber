@@ -1,12 +1,15 @@
 ARG SPARK_VERSION
 FROM kamudata/spark-py:$SPARK_VERSION
 
+# Reset to root to run installation tasks
+USER 0
 
 # Tools
-RUN apk add jq
-RUN wget -O /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64" && \
+RUN apt-get update && \
+    apt-get install -y wget unzip tini procps jq && \
+    rm -rf /root/.cache && rm -rf /var/cache/apt/* && \
+    wget -O /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/2.4.1/yq_linux_amd64" && \
     chmod +x /usr/local/bin/yq
-
 
 # Logging
 ADD spark/log4j.properties /opt/spark/conf/log4j.properties
@@ -15,8 +18,8 @@ ADD spark/log4j.properties /opt/spark/conf/log4j.properties
 # GeoSpark
 RUN cd /opt/spark/jars && \
     rm -f /opt/spark/jars/geospark-*.jar && \
-    wget https://github.com/DataSystemsLab/GeoSpark/releases/download/1.2.0-spark-2.3/geospark-1.2.0.jar && \
-    wget https://github.com/DataSystemsLab/GeoSpark/releases/download/1.2.0-spark-2.3/geospark-sql_2.3-1.2.0.jar
+    wget "https://oss.sonatype.org/service/local/repositories/snapshots/content/org/datasyslab/geospark/1.3.2-SNAPSHOT/geospark-1.3.2-20200731.023241-5.jar" -O "geospark-1.3.2.jar" && \
+    wget "https://oss.sonatype.org/service/local/repositories/snapshots/content/org/datasyslab/geospark-sql_3.0/1.3.2-SNAPSHOT/geospark-sql_3.0-1.3.2-20200731.023244-1.jar" -O "geospark-sql_3.0-1.3.2.jar"
 
 ADD spark/spark-defaults.conf /opt/spark/conf/spark-defaults.conf
 
@@ -29,7 +32,7 @@ ADD spark/spark-defaults.conf /opt/spark/conf/spark-defaults.conf
 #     unzip apache-livy*.zip && rm apache-livy*.zip && mv apache-livy* livy && \
 #     mkdir /opt/livy/logs
 
-ADD livy/apache-livy-0.7.0-kamu-bin.zip /opt
+ADD livy/apache-livy-0.8.0-kamu-bin.zip /opt
 RUN cd /opt && \
     unzip apache-livy*.zip && rm apache-livy*.zip && mv apache-livy* livy && \
     mkdir /opt/livy/logs
@@ -39,3 +42,7 @@ ADD livy/livy.conf /opt/livy/conf/livy.conf
 
 
 ADD livy/entrypoint.sh /opt/entrypoint.sh
+
+# Specify the User that the actual main process will run as
+ARG spark_uid=185
+USER ${spark_uid}
